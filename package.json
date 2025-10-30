@@ -1,5 +1,13 @@
 {
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "scripts":{
+    "start":"node app.js",
+    "client:dev":"cd client && npm run dev",
+    "client:build": "cd client && npm run build",
+    "client:preview":"cd client && npm run preview"
   }
 }
