@@ -1,13 +1,17 @@
 {
   "dependencies": {
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "sequelize": "^6.37.7"
   },
-  "scripts":{
-    "start":"node app.js",
-    "client:dev":"cd client && npm run dev",
+  "scripts": {
+    "start": "node app.js",
+    "client:dev": "cd client && npm run dev",
     "client:build": "cd client && npm run build",
-    "client:preview":"cd client && npm run preview"
+    "client:preview": "cd client && npm run preview"
   }
 }

@@ -1,47 +1,66 @@
-const {randomUUID} = require('crypto');
+const {DataTypes} = require('sequelize');
+const {sequelize} = require('./index');
 
-class ItemModel{
-    constructor(){
-    this.items = new Map;
-    }
+//Define sequelize model
+const Item = sequelize.define('Item',{
+    id:{
+        type:DataTypes.UUID,
+        defaultValue:DataTypes.UUIDV4,
+        primaryKey:true,
+    },
+    name:{
+        type:DataTypes.STRING,
+        allowNull:false,
+    },
+    description:{
+        type:DataTypes.TEXT,
+        allowNull:false,
+    },
+},{
+    tableName:'items',
+    timestamps: true,
+})
 
+//
+module.exports = {
     validate(item){
-        if(!item) return {valid:false, error:'Item is required'};
-        if (!item.name || typeof item.name !== 'string' || item.name.trim()=== ''){
-            return {valid:false, error:'Name is required and must be a non-empty string'}
+        if(!item)return {valid:false,error:'Item is required'}
+        if(!item.name || typeof(item.name) !== 'string' || item.name.trim() === ''){
+            return {valid:false,error:'Name must be a valid string'}
         }
-        if (!item.description || typeof item.description !== 'string'){
-            return {valid:false, error: 'Description is required and must be a string'}
+        if(!item.description || typeof(item.description) !== 'string' || item.description.trim() === ''){
+            return {valid:false,error:'Description must be a valid string'}
         }
-        return {valid:true}
-    }
-    create({name,description}){
-        const id = randomUUID();
-        const newItem = {id,name,description};
-        this.items.set(id,newItem);
-        return newItem;
+        return{valid:true}
+    },
 
-    }
-    list(){
-        return Array.from(this.items.values());
-    }
+    //create returns created item
+    async create({name,description}){
+        const created = await Item.create({name,description});
+        return created.toJSON();
+    },
+    async list(){
+        const rows = await Item.findAll({order:[['createadAt','DESC']]});
+        return rows.map(r =>r.toJSON());
+    },
 
-    get(id){
-        return this.items.get(id) || null;
-    }
+    async get(id){
+        const row = await Item.findByPk(id);
+        return row ? row.toJSON() : null;
+    },
+    
+    async update(id,{name,description}){
+        const row = await Item.findByPk(id)
+        if (!row) return null;
+        if (name !== undefined) row.name = name;
+        if (description !== undefined) row.description = description;
+        await row.save();
+        return row.toJSON();
+    },
 
-    update(id,{name,description}){
-        const existing = this.items.get(id);
-        if (!existing) return null
-        const updated = {...existing}
-        if (name !== undefined) updated.name = name;
-        if(description !== undefined) updated.description = description
-        this.items.set(id,updated);
-        return updated;
-    }
-    delete(id){
-        return this.items.delete(id);
-    }
+    async delete(id){
+        return !!(await Item.destroy({where:{id}}));
+    },
+
+    Model: Item,
 }
-
-module.exports = new ItemModel()

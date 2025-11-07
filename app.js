@@ -44,41 +44,71 @@ app.post('/contact', (req, res) => {
 
 // Items API
 // GET /items - list all items
-app.get('/items', (req, res) => {
-	res.json(itemModel.list())
+app.get('/items', async (req,res)=>{
+	try{
+		const rows = await itemModel.list();
+		res.json(rows);
+	}catch(err){
+		console.error("GET /items error",err);
+		res.status(500).json({error:'Internal server error'});
+	}
 })
 
 // GET /items/:id - get single item
-app.get('/items/:id', (req, res) => {
-	const it = itemModel.get(req.params.id)
-	if (!it) return res.status(404).json({ error: 'Item not found' })
-	res.json(it)
+app.get('/items/:id',async (req, res) => {
+	try{
+		const it = itemModel.get(req.params.id)
+		if (!it) return res.status(404).json({ error: 'Item not found' })
+		res.json(it)	
+	}catch(err){
+		console.error("GET /items/:id error",err);
+		res.status(500).json({error:'Internal server error'});
+	}
+	
 })
 
 // POST /items - create new item
-app.post('/items', (req, res) => {
-	const validation = itemModel.validate(req.body)
-	if (!validation.valid) return res.status(400).json({ error: validation.error })
-	const created = itemModel.create(req.body)
-	res.status(201).json(created)
+app.post('/items',async (req, res) => {
+	try{
+		const validation = itemModel.validate(req.body)
+		if (!validation.valid) return res.status(400).json({ error: validation.error })
+		const created = itemModel.create(req.body)
+		res.status(201).json(created)
+	}catch(err){
+		console.error("POST /items error",err);
+		res.status(500).json({error:'Internal server error'});
+	}
+	
 })
 
 // PUT /items/:id - update existing item
-app.put('/items/:id', (req, res) => {
-	const existing = itemModel.get(req.params.id)
-	if (!existing) return res.status(404).json({ error: 'Item not found' })
-	const validation = itemModel.validate({ name: req.body.name ?? existing.name, description: req.body.description ?? existing.description })
-	if (!validation.valid) return res.status(400).json({ error: validation.error })
-	const updated = itemModel.update(req.params.id, req.body)
-	res.json(updated)
+app.put('/items/:id', async (req, res) => {
+	try{
+		const existing = itemModel.get(req.params.id)
+		if (!existing) return res.status(404).json({ error: 'Item not found' })
+		const validation = itemModel.validate({ name: req.body.name ?? existing.name, description: req.body.description ?? existing.description })
+		if (!validation.valid) return res.status(400).json({ error: validation.error })
+		const updated = itemModel.update(req.params.id, req.body)
+		res.json(updated)
+	}catch(err){
+		console.error("PUT /items/:id error",error);
+		res.status(500).json({error:'Internal server error'});
+	}
+	
 })
 
 // DELETE /items/:id - delete item
-app.delete('/items/:id', (req, res) => {
-	const existing = itemModel.get(req.params.id)
-	if (!existing) return res.status(404).json({ error: 'Item not found' })
-	itemModel.delete(req.params.id)
-	res.status(204).end()
+app.delete('/items/:id',async (req, res) => {
+	try{
+		const existing = itemModel.get(req.params.id)
+		if (!existing) return res.status(404).json({ error: 'Item not found' })
+		itemModel.delete(req.params.id)
+		res.status(204).end()	
+	}catch(err){
+		console.error("DELETE /items/:id error",error);
+		res.status(500).json({error:'Internal server error'});
+	}
+	
 })
 
 const PORT = 3000;
@@ -86,6 +116,7 @@ const PORT = 3000;
 if (require.main === module) {
 	app.listen(PORT, () => {
 		console.log(`Express server running at http://localhost:${PORT}`);
+		
 	});
 }
 
