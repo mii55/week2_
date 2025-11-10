@@ -56,3 +56,8 @@ Thumbs.db
 *.der
 *.key
 *.pem
+
+# dotenv environment variable files
+.env
+.env.test
+.env.production
